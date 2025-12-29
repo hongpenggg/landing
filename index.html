@@ -3,39 +3,485 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H\W</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>Hong Peng's Space</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'teal-custom': '#008080',
+                        'dark-bg': '#1a202c',
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Base settings */
         body {
-            font-family: "Poppins", sans-serif;
-            line-height: 1.6;
-            color: #333;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto;   /* Allow vertical scroll for footer */
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        /* Orbit Animation Keyframes */
+        @keyframes rotateCW {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateCCW {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+
+        /* FIXED POSITIONING FOR ORBITS AND LOGO 
+           This ensures they never scroll and stay perfectly centered relative to viewport.
+        */
+        .fixed-center-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through gaps */
+            /* Ensure width/height are zero so the flow doesn't affect layout */
+            width: 0;
+            height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Rings */
+        .orbit-ring {
+            position: absolute;
+            /* No translate needed here because the parent is already centered 0x0 */
+            border-radius: 50%;
+        }
+
+        /* The actual rotating container */
+        .rotator {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Pill Link Container */
+        .satellite {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* We will use margin-top/left or transforms to position relative to center 
+               Logic: The satellite starts at (0,0) (center).
+            */
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* THE LINK STYLING */
+        .satellite-inner {
+            padding: 8px 18px;
+            border-radius: 9999px;
+            white-space: nowrap;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.95rem;
+            
+            /* Light Mode Default */
+            background-color: var(--pill-color);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        header {
-            background: #fff;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .satellite-inner:hover {
+            transform: scale(1.15);
+            z-index: 50;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
         }
+        
+        /* DARK MODE OVERRIDES - Frosted Glass */
+        .dark .satellite-inner {
+            background-color: rgba(255, 255, 255, 0.1) !important; 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .dark .satellite-inner:hover {
+            background-color: rgba(255, 255, 255, 0.25) !important;
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Squircle Button Animations */
+        .squircle-btn {
+            transition: width 0.4s ease, background-color 0.3s, color 0.3s;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .squircle-btn .text-label {
+            opacity: 0;
+            width: 0;
+            transition: opacity 0.2s 0.1s, width 0s 0.4s; 
+            pointer-events: none;
+            margin-left: 0; 
+        }
+        
+        .squircle-btn .icon-label {
+            transition: opacity 0.2s;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .squircle-btn:hover {
+            width: auto;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+            justify-content: center;
+        }
+
+        .squircle-btn:hover .icon-label {
+            display: none;
+        }
+
+        .squircle-btn:hover .text-label {
+            opacity: 1;
+            width: auto;
+            pointer-events: auto;
+            transition: opacity 0.3s;
+        }
+
+        /* Center Logo Styling */
+        .center-logo {
+            width: 140px; 
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* It is inside the fixed container, so no position absolute needed here */
+            pointer-events: auto;
+            z-index: 20;
+        }
+        
+        /* Text Highlight */
+        .highlight-text {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .dark .highlight-text {
+            text-shadow: 0 0 5px rgba(255,255,255,0.4);
+        }
+
+        /* Footer */
+        .page-footer {
+            width: 100%;
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 5;
+        }
+        .dark .page-footer {
+            color: #aaa;
+        }
+        
+        /* Scroll spacer to allow scrolling "down" */
+        .scroll-spacer {
+            height: 120vh; /* 120% view height so there's room to scroll */
+            pointer-events: none;
+        }
+
     </style>
 </head>
-<body>
-    <header>
-        <h2>Hi</h2>
-    </header>
-    
-    <section class="hero">
-        <h1>Welcome to Our Landing Page</h1>
-        <p>Build something amazing today</p>
-        <button>Get Started</button>
-    </section>
+<body class="bg-white transition-colors duration-500 ease-in-out dark:bg-gray-900 dark:text-white">
+
+    <!-- Audio Element (Autoplay attempt) -->
+    <audio id="bg-music" loop autoplay>
+        <source src="bg.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Top Right Controls (Horizontal) -->
+    <div class="fixed top-6 right-6 z-50 flex flex-row items-center justify-end gap-3">
+        
+        <!-- Redirect Button -->
+        <a href="https://hongpenggg.github.io/landing/old.html" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
+            <span class="icon-label"><i class="fa-solid fa-arrow-rotate-left"></i></span>
+            <span class="text-label">Change to traditional page</span>
+        </a>
+
+        <!-- Dark/Light Mode Button -->
+        <button id="btn-theme" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
+            <span class="icon-label"><i class="fa-solid fa-moon"></i></span>
+            <span class="text-label">Dark Mode</span>
+        </button>
+
+        <!-- Music Button -->
+        <button id="btn-music" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
+            <span class="icon-label relative">
+                <i class="fa-solid fa-music"></i>
+                <div id="music-strike" class="absolute top-1/2 left-0 w-full h-0.5 bg-red-500 transform -translate-y-1/2 rotate-45 hidden"></div>
+            </span>
+            <span class="text-label">Turn off music</span>
+        </button>
+
+    </div>
+
+    <!-- MAIN FIXED CONTAINER: Holds Logo and Orbits centrally -->
+    <div class="fixed-center-container">
+        <!-- Logo -->
+        <img src="https://hongpenggg.github.io/landing/Logo.png" alt="Logo" class="center-logo" onerror="this.src='https://placehold.co/150x150/202020/FFF?text=Logo'">
+        
+        <!-- Orbit System -->
+        <!-- Since container is 0x0 and centered, orbits will spin around it -->
+        <div id="orbit-system"></div>
+    </div>
+
+    <!-- Scroll Spacer and Footer -->
+    <div class="scroll-spacer"></div>
+    <footer class="page-footer">
+        <p>&copy; Hongpeng Wei, 2025</p>
+    </footer>
+
+    <script>
+        // --- Data ---
+        const links = [
+            { text: "Portfolio", url: "https://hongpenggg.github.io" },
+            { text: "About Me", url: "https://hongpenggg.github.io/jkjk6767" },
+            { text: "Who I’m not", url: "https://hongpenggg.github.io/jkjk6767/game-pages/page1.html" },
+            { text: "Small World", url: "https://hongpenggg.github.io/jkjk6767/game-pages/smallworld.html" },
+            { text: "My Hobbies", url: "https://hongpenggg.github.io/jkjk6767/game-pages/hobbies.html" },
+            { text: "ScentWorld", url: "https://hongpenggg.github.io/scentworld/" },
+            { text: "My STEM Portfolio", url: "https://github.com/hongpenggg" },
+            { text: "My Learning Portfolio", url: "https://hongpeng.notion.site/Portfolio-b6ceb68ae1e1496d9e1714f271fc4899" },
+            { text: "Contact Me", url: "https://beacons.ai/hongpeng" },
+            { text: "My Design Portfolio", url: "https://beacons.ai/hongpeng/mediakit?origin=lib" },
+            { text: "Il Consigliere", url: "https://github.com/hongpenggg/il_consigliere" },
+            { text: "My Academic Interests", url: "https://hongpenggg.github.io/jkjk6767/game-pages/page4.html" }
+        ];
+
+        const colors = [
+            "rgba(255, 99, 132, 0.85)",   
+            "rgba(54, 162, 235, 0.85)",   
+            "rgba(255, 206, 86, 0.85)",   
+            "rgba(75, 192, 192, 0.85)",   
+            "rgba(153, 102, 255, 0.85)",  
+            "rgba(255, 159, 64, 0.85)",   
+            "rgba(199, 21, 133, 0.85)",   
+            "rgba(34, 139, 34, 0.85)",    
+            "rgba(0, 0, 139, 0.85)",      
+            "rgba(218, 112, 214, 0.85)"   
+        ];
+
+        // --- Orbit Configuration ---
+        // 6 Concentric Rings
+        // Radii are in vmin (viewport minimum dimension)
+        const orbitConfig = [
+            { radius: 15, speed: 60, direction: 'CW' }, 
+            { radius: 21, speed: 70, direction: 'CCW' },
+            { radius: 27, speed: 80, direction: 'CW' },
+            { radius: 33, speed: 90, direction: 'CCW' },
+            { radius: 39, speed: 100, direction: 'CW' },
+            { radius: 45, speed: 110, direction: 'CCW' }
+        ];
+
+        // --- Helper Functions ---
+        
+        function getRandomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Generator Logic ---
+
+        const system = document.getElementById('orbit-system');
+
+        orbitConfig.forEach((config, index) => {
+            const ring = document.createElement('div');
+            ring.className = `orbit-ring ${index === orbitConfig.length - 1 ? 'orbit-shadow' : ''}`;
+            
+            // To debug rings: uncomment border
+            // ring.style.border = "1px solid rgba(0,0,0,0.1)"; 
+            // ring.style.width = (config.radius * 2) + "vmin";
+            // ring.style.height = (config.radius * 2) + "vmin";
+            // ring.style.top = "50%";
+            // ring.style.left = "50%";
+            // ring.style.transform = "translate(-50%, -50%)";
+
+            const rotator = document.createElement('div');
+            rotator.className = 'rotator';
+            
+            const animName = config.direction === 'CW' ? 'rotateCW' : 'rotateCCW';
+            
+            // Set animation
+            rotator.style.animation = `${animName} ${config.speed}s linear infinite`;
+            // Random start angle so they don't look like a grid
+            const randomStart = Math.random() * 360;
+            rotator.style.transform = `rotate(${randomStart}deg)`;
+
+            // Dynamic Count
+            // C = 2 * PI * R
+            // Item size approx 22 vmin for spacing
+            const C = 2 * Math.PI * config.radius;
+            const approxItemSize = 22; 
+            const count = Math.max(3, Math.floor(C / approxItemSize)); 
+
+            // Populate links
+            let ringLinks = [];
+            while(ringLinks.length < count) {
+                ringLinks = ringLinks.concat(shuffleArray([...links]));
+            }
+            ringLinks = ringLinks.slice(0, count); 
+
+            const angleStep = 360 / count;
+
+            ringLinks.forEach((linkData, i) => {
+                const angle = i * angleStep;
+                const pill = document.createElement('div');
+                pill.className = 'satellite';
+                
+                // --- ORIENTATION LOGIC ---
+                // 1. rotate(${angle}deg): Rotate the coordinate system to the spot on the circle.
+                // 2. translate(${config.radius}vmin): Push out to the radius.
+                // 3. rotate(-90deg): Rotate the pill itself so the TOP faces the CENTER.
+                pill.style.transform = `rotate(${angle}deg) translate(${config.radius}vmin) rotate(-90deg)`;
+                
+                const inner = document.createElement('a');
+                inner.href = linkData.url;
+                inner.className = 'satellite-inner';
+                inner.style.setProperty('--pill-color', getRandomColor());
+                inner.innerHTML = `<span class="highlight-text">#${linkData.text}</span>`;
+                
+                pill.appendChild(inner);
+                rotator.appendChild(pill);
+            });
+
+            ring.appendChild(rotator);
+            system.appendChild(ring);
+        });
+
+
+        // --- Interaction Logic ---
+
+        const themeBtn = document.getElementById('btn-theme');
+        const themeIcon = themeBtn.querySelector('.icon-label i');
+        const themeText = themeBtn.querySelector('.text-label');
+        const body = document.body;
+
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            
+            if(isDark) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = "Light Mode";
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = "Dark Mode";
+            }
+        });
+
+        // Music Logic
+        const musicBtn = document.getElementById('btn-music');
+        const musicStrike = document.getElementById('music-strike');
+        const musicText = musicBtn.querySelector('.text-label');
+        const audio = document.getElementById('bg-music');
+        
+        // Assume playing by default (user request)
+        let isPlaying = true; 
+
+        function updateMusicUI() {
+            if(isPlaying) {
+                musicStrike.classList.add('hidden'); 
+                musicText.textContent = "Turn off music";
+            } else {
+                musicStrike.classList.remove('hidden'); 
+                musicText.textContent = "Turn on music";
+            }
+        }
+
+        // Initialize UI as Playing
+        updateMusicUI();
+
+        musicBtn.addEventListener('click', () => {
+            if(isPlaying) {
+                audio.pause();
+                isPlaying = false;
+            } else {
+                audio.play();
+                isPlaying = true;
+            }
+            updateMusicUI();
+        });
+
+        // Auto-play / Fallback Strategy
+        window.addEventListener('load', () => {
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Success
+                    isPlaying = true;
+                    updateMusicUI();
+                })
+                .catch(error => {
+                    // Auto-play blocked
+                    console.log("Autoplay blocked. Waiting for user interaction.");
+                    
+                    // Note: We leave isPlaying=true and UI showing "Turn off music" 
+                    // because the user requested the "default state" to be playing.
+                    // We just attach a listener to make it ACTUALLY play on first click.
+                    
+                    const startMusicOnce = () => {
+                        audio.play();
+                        // No need to toggle isPlaying, we assume it was "on" just blocked
+                        updateMusicUI();
+                        document.removeEventListener('click', startMusicOnce);
+                    };
+                    document.addEventListener('click', startMusicOnce);
+                });
+            }
+        });
+
+    </script>
 </body>
 </html>
