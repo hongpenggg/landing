@@ -3,279 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hong Peng's Space</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'teal-custom': '#008080',
-                        'dark-bg': '#1a202c',
-                    },
-                    fontFamily: {
-                        sans: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Hongpeng Wei - Landing</title>
+    <!-- Lucide Icons (Production CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Base settings */
+        /* --- RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            overflow-y: auto;   /* Allow vertical scroll for footer */
-            width: 100vw;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.5s ease;
             min-height: 100vh;
-        }
-
-        /* Orbit Animation Keyframes */
-        @keyframes rotateCW {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes rotateCCW {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(-360deg); }
-        }
-
-        /* FIXED POSITIONING FOR ORBITS AND LOGO 
-           This ensures they never scroll and stay perfectly centered relative to viewport.
-        */
-        .fixed-center-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            pointer-events: none; /* Let clicks pass through gaps */
-            /* Ensure width/height are zero so the flow doesn't affect layout */
-            width: 0;
-            height: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            overflow-x: hidden;
+            /* Default Text Color (Dark Mode) */
+            color: #ffffff;
         }
 
-        /* The Rings */
-        .orbit-ring {
-            position: absolute;
-            /* No translate needed here because the parent is already centered 0x0 */
-            border-radius: 50%;
-        }
-
-        /* The actual rotating container */
-        .rotator {
+        /* --- BACKGROUND LAYERS --- */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+            transition: opacity 0.5s ease-in-out;
         }
 
-        /* The Pill Link Container */
-        .satellite {
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* We will use margin-top/left or transforms to position relative to center 
-               Logic: The satellite starts at (0,0) (center).
-            */
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* --- LAYOUT ALIGNMENT --- */
+        /* This variable controls the left alignment for Logo, Links, and Footer */
+        :root {
+            --site-padding-left: 6vw;
         }
 
-        /* THE LINK STYLING */
-        .satellite-inner {
-            padding: 8px 18px;
-            border-radius: 9999px;
-            white-space: nowrap;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        @media (max-width: 768px) {
+            :root {
+                --site-padding-left: 24px;
+            }
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 24px var(--site-padding-left); /* Aligns with links */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 100;
+            pointer-events: none; /* Let clicks pass through empty space */
+        }
+
+        header > * {
+            pointer-events: auto; /* Re-enable clicks on children */
+        }
+
+        /* --- LOGO INTERACTION (Header & Footer) --- */
+        .logo-container {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: default;
+            user-select: none;
             text-decoration: none;
-            display: inline-block;
-            font-size: 0.95rem;
-            
-            /* Light Mode Default */
-            background-color: var(--pill-color);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .satellite-inner:hover {
-            transform: scale(1.15);
-            z-index: 50;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-        }
-        
-        /* DARK MODE OVERRIDES - Frosted Glass */
-        .dark .satellite-inner {
-            background-color: rgba(255, 255, 255, 0.1) !important; 
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            color: inherit;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .dark .satellite-inner:hover {
-            background-color: rgba(255, 255, 255, 0.25) !important;
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-        }
-
-        /* Squircle Button Animations */
-        .squircle-btn {
-            transition: width 0.4s ease, background-color 0.3s, color 0.3s;
-            border-radius: 18px;
+        .logo-expand {
+            max-width: 0;
             overflow: hidden;
+            opacity: 0;
+            white-space: nowrap;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: inline-block;
+        }
+
+        /* On hover of the container, expand the text */
+        .logo-container:hover .logo-expand {
+            max-width: 200px; /* Sufficient width to show text */
+            opacity: 1;
+        }
+
+        /* --- CONTROLS (Top Right Buttons) --- */
+        .controls-wrapper {
+            display: flex;
+            flex-direction: row-reverse; /* Right to Left */
+            gap: 16px;
+            align-items: center;
+        }
+
+        .control-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px; /* Squircle */
+            border: none;
+            cursor: pointer;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, color 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             white-space: nowrap;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .squircle-btn .text-label {
-            opacity: 0;
-            width: 0;
-            transition: opacity 0.2s 0.1s, width 0s 0.4s; 
-            pointer-events: none;
-            margin-left: 0; 
-        }
-        
-        .squircle-btn .icon-label {
-            transition: opacity 0.2s;
-            min-width: 20px;
-            text-align: center;
+        .control-btn:hover {
+            width: 160px; /* Expand width */
         }
 
-        .squircle-btn:hover {
-            width: auto;
-            padding-left: 1.25rem;
-            padding-right: 1.25rem;
+        .control-btn .icon-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            transition: opacity 0.2s;
         }
 
-        .squircle-btn:hover .icon-label {
-            display: none;
-        }
-
-        .squircle-btn:hover .text-label {
-            opacity: 1;
-            width: auto;
-            pointer-events: auto;
-            transition: opacity 0.3s;
-        }
-
-        /* Center Logo Styling */
-        .center-logo {
-            width: 140px; 
-            height: 140px;
-            border-radius: 50%;
-            object-fit: cover;
-            /* It is inside the fixed container, so no position absolute needed here */
-            pointer-events: auto;
-            z-index: 20;
-        }
-        
-        /* Text Highlight */
-        .highlight-text {
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        .dark .highlight-text {
-            text-shadow: 0 0 5px rgba(255,255,255,0.4);
-        }
-
-        /* Footer */
-        .page-footer {
+        .control-btn .text-container {
+            position: absolute;
+            left: 0;
             width: 100%;
             text-align: center;
-            padding: 2rem;
-            color: #666;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 5;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+            font-size: 0.875rem; /* 14px */
+            font-weight: 500;
+            padding: 0 10px;
         }
-        .dark .page-footer {
-            color: #aaa;
+
+        .control-btn:hover .icon-container {
+            opacity: 0;
         }
-        
-        /* Scroll spacer to allow scrolling "down" */
-        .scroll-spacer {
-            height: 120vh; /* 120% view height so there's room to scroll */
-            pointer-events: none;
+
+        .control-btn:hover .text-container {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- FROSTED GLASS STYLES --- */
+        /* Dark Mode Button Styles */
+        .btn-style-dark {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .btn-style-dark:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Light Mode Button Styles */
+        .btn-style-light {
+            background: rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a1a1a;
+        }
+        .btn-style-light:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* --- MAIN CONTENT & LINKS --- */
+        main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            padding-bottom: 50px;
+            /* Critical Alignment */
+            padding-left: var(--site-padding-left);
+            padding-right: 24px;
+        }
+
+        #links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .link-item {
+            text-decoration: none;
+            color: inherit;
+            font-size: 1.5rem; /* 24px */
+            font-weight: 300;
+            letter-spacing: 0.025em;
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            transition: color 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .link-item { font-size: 1.8rem; }
+        }
+
+        /* The arrow that appears */
+        .link-arrow {
+            width: 0; /* Hidden initially */
+            overflow: hidden;
+            opacity: 0;
+            font-weight: 700;
+            font-size: 0.9em;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            margin-right: 0;
+            display: inline-block;
+        }
+
+        .link-item:hover .link-arrow {
+            width: 20px; /* Expands to push text */
+            opacity: 1;
+            margin-right: 12px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 32px var(--site-padding-left);
+            padding-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: inline-flex; /* For expansion logic */
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .footer-sub {
+            font-size: 0.75rem;
+            opacity: 0.6;
         }
 
     </style>
 </head>
-<body class="bg-white transition-colors duration-500 ease-in-out dark:bg-gray-900 dark:text-white">
+<body>
 
-    <!-- Audio Element (Autoplay attempt) -->
-    <audio id="bg-music" loop autoplay>
+    <!-- Background Images -->
+    <div id="bg-dark" class="bg-layer" style="background-image: url('dark.png'); opacity: 1;"></div>
+    <div id="bg-light" class="bg-layer" style="background-image: url('light.png'); opacity: 0;"></div>
+
+    <!-- Audio Source -->
+    <audio id="bg-audio" loop>
         <source src="bg.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
 
-    <!-- Top Right Controls (Horizontal) -->
-    <div class="fixed top-6 right-6 z-50 flex flex-row items-center justify-end gap-3">
-        
-        <!-- Redirect Button -->
-        <a href="https://hongpenggg.github.io/landing/old.html" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
-            <span class="icon-label"><i class="fa-solid fa-arrow-rotate-left"></i></span>
-            <span class="text-label">Change to traditional page</span>
+    <!-- Header -->
+    <header>
+        <!-- Logo with expansion effect -->
+        <a href="#" class="logo-container">
+            <span>H</span><span class="logo-expand">ongpeng</span>
+            <span style="margin: 0 4px;">\</span>
+            <span>W</span><span class="logo-expand">ei</span>
         </a>
 
-        <!-- Dark/Light Mode Button -->
-        <button id="btn-theme" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
-            <span class="icon-label"><i class="fa-solid fa-moon"></i></span>
-            <span class="text-label">Dark Mode</span>
-        </button>
+        <!-- Controls -->
+        <div class="controls-wrapper">
+            
+            <!-- Music Button -->
+            <button id="music-btn" class="control-btn btn-style-dark">
+                <div class="icon-container">
+                    <i id="music-icon" data-lucide="music-2"></i>
+                </div>
+                <div class="text-container">
+                    <span id="music-text">Turn off music</span>
+                </div>
+            </button>
 
-        <!-- Music Button -->
-        <button id="btn-music" class="squircle-btn w-12 h-12 bg-gray-800 text-white hover:bg-gray-700 dark:bg-white/20 dark:hover:bg-white/30 dark:border-white/30 backdrop-blur-md">
-            <span class="icon-label relative">
-                <i class="fa-solid fa-music"></i>
-                <div id="music-strike" class="absolute top-1/2 left-0 w-full h-0.5 bg-red-500 transform -translate-y-1/2 rotate-45 hidden"></div>
-            </span>
-            <span class="text-label">Turn off music</span>
-        </button>
+            <!-- Theme Button -->
+            <button id="theme-btn" class="control-btn btn-style-dark">
+                <div class="icon-container">
+                    <i id="theme-icon" data-lucide="sun"></i>
+                </div>
+                <div class="text-container">
+                    <span id="theme-text">Light Mode</span>
+                </div>
+            </button>
 
-    </div>
+        </div>
+    </header>
 
-    <!-- MAIN FIXED CONTAINER: Holds Logo and Orbits centrally -->
-    <div class="fixed-center-container">
-        <!-- Logo -->
-        <img src="https://hongpenggg.github.io/landing/Logo.png" alt="Logo" class="center-logo" onerror="this.src='https://placehold.co/150x150/202020/FFF?text=Logo'">
+    <!-- Main Content -->
+    <main>
+        <div id="links-list">
+            <!-- Links generated by JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <!-- Footer Logo with same expansion effect but larger -->
+        <div class="logo-container footer-logo">
+            <span>H</span><span class="logo-expand">ongpeng</span>
+            <span style="margin: 0 4px;">\</span>
+            <span>W</span><span class="logo-expand">ei</span>
+        </div>
         
-        <!-- Orbit System -->
-        <!-- Since container is 0x0 and centered, orbits will spin around it -->
-        <div id="orbit-system"></div>
-    </div>
-
-    <!-- Scroll Spacer and Footer -->
-    <div class="scroll-spacer"></div>
-    <footer class="page-footer">
-        <p>&copy; Hongpeng Wei, 2025</p>
+        <p class="footer-text">&copy; Hongpeng Wei, 2025.</p>
+        <p class="footer-sub">The music on this site is "How Beautiful the Silence (Set 1)" by Fluorescent Vibes, Free Music Archive. (CC BY-NC-SA)</p>
     </footer>
 
+    <!-- Logic -->
     <script>
-        // --- Data ---
-        const links = [
+        /* --- CONFIGURATION --- */
+        const linksData = [
             { text: "Portfolio", url: "https://hongpenggg.github.io" },
             { text: "About Me", url: "https://hongpenggg.github.io/jkjk6767" },
             { text: "Who I’m not", url: "https://hongpenggg.github.io/jkjk6767/game-pages/page1.html" },
@@ -290,196 +356,126 @@
             { text: "My Academic Interests", url: "https://hongpenggg.github.io/jkjk6767/game-pages/page4.html" }
         ];
 
-        const colors = [
-            "rgba(255, 99, 132, 0.85)",   
-            "rgba(54, 162, 235, 0.85)",   
-            "rgba(255, 206, 86, 0.85)",   
-            "rgba(75, 192, 192, 0.85)",   
-            "rgba(153, 102, 255, 0.85)",  
-            "rgba(255, 159, 64, 0.85)",   
-            "rgba(199, 21, 133, 0.85)",   
-            "rgba(34, 139, 34, 0.85)",    
-            "rgba(0, 0, 139, 0.85)",      
-            "rgba(218, 112, 214, 0.85)"   
-        ];
+        /* --- STATE --- */
+        let isDarkMode = true;
+        let isMusicPlaying = true; // Intent to play
 
-        // --- Orbit Configuration ---
-        // 6 Concentric Rings
-        // Radii are in vmin (viewport minimum dimension)
-        const orbitConfig = [
-            { radius: 15, speed: 60, direction: 'CW' }, 
-            { radius: 21, speed: 70, direction: 'CCW' },
-            { radius: 27, speed: 80, direction: 'CW' },
-            { radius: 33, speed: 90, direction: 'CCW' },
-            { radius: 39, speed: 100, direction: 'CW' },
-            { radius: 45, speed: 110, direction: 'CCW' }
-        ];
-
-        // --- Helper Functions ---
-        
-        function getRandomColor() {
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // --- Generator Logic ---
-
-        const system = document.getElementById('orbit-system');
-
-        orbitConfig.forEach((config, index) => {
-            const ring = document.createElement('div');
-            ring.className = `orbit-ring ${index === orbitConfig.length - 1 ? 'orbit-shadow' : ''}`;
-            
-            // To debug rings: uncomment border
-            // ring.style.border = "1px solid rgba(0,0,0,0.1)"; 
-            // ring.style.width = (config.radius * 2) + "vmin";
-            // ring.style.height = (config.radius * 2) + "vmin";
-            // ring.style.top = "50%";
-            // ring.style.left = "50%";
-            // ring.style.transform = "translate(-50%, -50%)";
-
-            const rotator = document.createElement('div');
-            rotator.className = 'rotator';
-            
-            const animName = config.direction === 'CW' ? 'rotateCW' : 'rotateCCW';
-            
-            // Set animation
-            rotator.style.animation = `${animName} ${config.speed}s linear infinite`;
-            // Random start angle so they don't look like a grid
-            const randomStart = Math.random() * 360;
-            rotator.style.transform = `rotate(${randomStart}deg)`;
-
-            // Dynamic Count
-            // C = 2 * PI * R
-            // Item size approx 22 vmin for spacing
-            const C = 2 * Math.PI * config.radius;
-            const approxItemSize = 22; 
-            const count = Math.max(3, Math.floor(C / approxItemSize)); 
-
-            // Populate links
-            let ringLinks = [];
-            while(ringLinks.length < count) {
-                ringLinks = ringLinks.concat(shuffleArray([...links]));
-            }
-            ringLinks = ringLinks.slice(0, count); 
-
-            const angleStep = 360 / count;
-
-            ringLinks.forEach((linkData, i) => {
-                const angle = i * angleStep;
-                const pill = document.createElement('div');
-                pill.className = 'satellite';
-                
-                // --- ORIENTATION LOGIC ---
-                // 1. rotate(${angle}deg): Rotate the coordinate system to the spot on the circle.
-                // 2. translate(${config.radius}vmin): Push out to the radius.
-                // 3. rotate(-90deg): Rotate the pill itself so the TOP faces the CENTER.
-                pill.style.transform = `rotate(${angle}deg) translate(${config.radius}vmin) rotate(-90deg)`;
-                
-                const inner = document.createElement('a');
-                inner.href = linkData.url;
-                inner.className = 'satellite-inner';
-                inner.style.setProperty('--pill-color', getRandomColor());
-                inner.innerHTML = `<span class="highlight-text">#${linkData.text}</span>`;
-                
-                pill.appendChild(inner);
-                rotator.appendChild(pill);
-            });
-
-            ring.appendChild(rotator);
-            system.appendChild(ring);
-        });
-
-
-        // --- Interaction Logic ---
-
-        const themeBtn = document.getElementById('btn-theme');
-        const themeIcon = themeBtn.querySelector('.icon-label i');
-        const themeText = themeBtn.querySelector('.text-label');
+        /* --- ELEMENTS --- */
         const body = document.body;
+        const bgDark = document.getElementById('bg-dark');
+        const bgLight = document.getElementById('bg-light');
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const musicBtn = document.getElementById('music-btn');
+        const musicIcon = document.getElementById('music-icon');
+        const musicText = document.getElementById('music-text');
+        const audio = document.getElementById('bg-audio');
+        const linksList = document.getElementById('links-list');
 
-        themeBtn.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            const isDark = body.classList.contains('dark');
-            
-            if(isDark) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                themeText.textContent = "Light Mode";
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-                themeText.textContent = "Dark Mode";
-            }
+        /* --- INITIALIZATION --- */
+        
+        // 1. Generate Links
+        linksData.forEach(link => {
+            const a = document.createElement('a');
+            a.href = link.url;
+            a.target = "_blank";
+            a.className = "link-item";
+            // The arrow is placed BEFORE text in DOM, but hidden.
+            // When it expands width, it pushes text right.
+            a.innerHTML = `
+                <span class="link-arrow">&gt;</span>
+                <span class="link-text">${link.text}</span>
+            `;
+            linksList.appendChild(a);
         });
 
-        // Music Logic
-        const musicBtn = document.getElementById('btn-music');
-        const musicStrike = document.getElementById('music-strike');
-        const musicText = musicBtn.querySelector('.text-label');
-        const audio = document.getElementById('bg-music');
-        
-        // Assume playing by default (user request)
-        let isPlaying = true; 
+        // 2. UI Updates
+        function updateTheme() {
+            if (isDarkMode) {
+                // Dark Mode Active
+                bgDark.style.opacity = '1';
+                bgLight.style.opacity = '0';
+                body.style.color = '#ffffff';
+                
+                // Update Button Classes
+                [themeBtn, musicBtn].forEach(btn => {
+                    btn.classList.remove('btn-style-light');
+                    btn.classList.add('btn-style-dark');
+                });
 
-        function updateMusicUI() {
-            if(isPlaying) {
-                musicStrike.classList.add('hidden'); 
-                musicText.textContent = "Turn off music";
+                // Icon logic
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeText.textContent = 'Light Mode';
             } else {
-                musicStrike.classList.remove('hidden'); 
-                musicText.textContent = "Turn on music";
+                // Light Mode Active
+                bgDark.style.opacity = '0';
+                bgLight.style.opacity = '1';
+                body.style.color = '#1a1a1a';
+
+                // Update Button Classes
+                [themeBtn, musicBtn].forEach(btn => {
+                    btn.classList.remove('btn-style-dark');
+                    btn.classList.add('btn-style-light');
+                });
+
+                // Icon logic
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeText.textContent = 'Dark Mode';
             }
+            lucide.createIcons();
         }
 
-        // Initialize UI as Playing
-        updateMusicUI();
+        function updateMusicState() {
+            if (isMusicPlaying) {
+                // Playing State
+                // Prompt: "Default is music icon with line across it to signify off music"
+                musicIcon.setAttribute('data-lucide', 'music-2-off');
+                musicText.textContent = 'Turn off music';
+                
+                audio.play().catch(err => {
+                    console.log("Audio autoplay blocked by browser policy. Interaction required.");
+                });
+            } else {
+                // Paused State
+                musicIcon.setAttribute('data-lucide', 'music-2');
+                musicText.textContent = 'Turn on music';
+                audio.pause();
+            }
+            lucide.createIcons();
+        }
+
+        /* --- EVENTS --- */
+        themeBtn.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            updateTheme();
+        });
 
         musicBtn.addEventListener('click', () => {
-            if(isPlaying) {
-                audio.pause();
-                isPlaying = false;
-            } else {
-                audio.play();
-                isPlaying = true;
-            }
-            updateMusicUI();
+            isMusicPlaying = !isMusicPlaying;
+            updateMusicState();
         });
 
-        // Auto-play / Fallback Strategy
-        window.addEventListener('load', () => {
-            const playPromise = audio.play();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTheme();
             
+            // Try to play audio immediately
+            const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
-                    // Success
-                    isPlaying = true;
-                    updateMusicUI();
-                })
-                .catch(error => {
-                    // Auto-play blocked
-                    console.log("Autoplay blocked. Waiting for user interaction.");
-                    
-                    // Note: We leave isPlaying=true and UI showing "Turn off music" 
-                    // because the user requested the "default state" to be playing.
-                    // We just attach a listener to make it ACTUALLY play on first click.
-                    
-                    const startMusicOnce = () => {
-                        audio.play();
-                        // No need to toggle isPlaying, we assume it was "on" just blocked
-                        updateMusicUI();
-                        document.removeEventListener('click', startMusicOnce);
-                    };
-                    document.addEventListener('click', startMusicOnce);
+                    isMusicPlaying = true;
+                    updateMusicState();
+                }).catch(error => {
+                    // Autoplay prevented
+                    console.log("Autoplay blocked.");
+                    // We maintain UI as 'playing' intent, 
+                    // or we could switch to paused. 
+                    // Keeping as is so first click syncs.
                 });
             }
+            
+            lucide.createIcons();
         });
 
     </script>
